@@ -1,0 +1,12 @@
+# Secrets
+Secret.swift
+
+# Xcode
+build/
+DerivedData/
+*.xcuserstate
+xcuserdata/
+.DS_Store
+
+# ML Models
+*.mlpackage
