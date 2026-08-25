@@ -12,8 +12,8 @@ final class NetworkManager {
     
     private let baseURL = "https://api.themoviedb.org/3"
     
-    func fetchPopularMovies() async throws -> [Movie] {
-        guard let url = URL(string: "\(baseURL)/movie/popular?language=en-US&page=1")
+    func fetchPopularMovies(page: Int = 1) async throws -> MovieResponse {
+        guard let url = URL(string: "\(baseURL)/movie/popular?language=en-US&page=\(page)")
         else {
             throw NetworkError.invalidURL
         }
@@ -32,8 +32,7 @@ final class NetworkManager {
         }
         
         do{
-            let decode = try JSONDecoder().decode(MovieResponse.self, from: data)
-            return decode.results
+            return try JSONDecoder().decode(MovieResponse.self, from: data)
         } catch {
             throw NetworkError.decodingFailed
         }

@@ -5,6 +5,10 @@ class MovieListViewController: UIViewController {
     private var movies: [Movie] = []
     private let tableView = UITableView()
     private let refreshControl = UIRefreshControl()
+   
+    private var currentPage = 1
+    private var totalPages = 1
+    private var isLoadingMoreMovies = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -45,16 +49,41 @@ class MovieListViewController: UIViewController {
     
     private func loadMovies() async {
         do {
-            let fetchedMovies = try await NetworkManager.shared.fetchPopularMovies()
-            self.movies = fetchedMovies
+            let response = try await NetworkManager.shared.fetchPopularMovies()
+            self.movies = response.results
+            self.totalPages = response.totalPages
             tableView.reloadData()
-            print("Berhasil dapat \(fetchedMovies.count) film")
-            print(fetchedMovies.first?.title ?? "kosong")
+            print("Berhasil dapat \(response.results.count) film")
         } catch {
             print("Gagal fetch Movies: \(error)")
         }
     }
+    @MainActor
+    private func loadMoreMoviesIfNeeded() {
+        guard !isLoadingMoreMovies else { return }
+        guard currentPage < totalPages else { return }
+        
+        isLoadingMoreMovies = true
+        
+        
+        Task {
+            do {
+                let nextPage = currentPage + 1
+                let response = try await NetworkManager.shared.fetchPopularMovies(page: nextPage)
+                
+                self.movies.append(contentsOf: response.results)
+                self.currentPage = nextPage
+                self.totalPages = response.totalPages
+                self.tableView.reloadData()
+            } catch {
+                print("Failed to Load More Movies: \(error)")
+            }
+            isLoadingMoreMovies = false
+        }
+    }
 }
+
+
 
 extension MovieListViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -78,7 +107,13 @@ extension MovieListViewController: UITableViewDelegate {
         tableView.deselectRow(at: indexPath, animated: true)
         let selectedMovie = movies[indexPath.row]
         print("Tapped: \(selectedMovie.title)")
+    }
+    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+        let isNearBottom = indexPath.row >= movies.count - 5
         
+        if isNearBottom {
+            loadMoreMoviesIfNeeded()
+        }
     }
 }
 
