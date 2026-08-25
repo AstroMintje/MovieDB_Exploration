@@ -3,8 +3,8 @@ import UIKit
 class MovieListViewController: UIViewController {
     
     private var movies: [Movie] = []
-    
     private let tableView = UITableView()
+    private let refreshControl = UIRefreshControl()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -18,6 +18,13 @@ class MovieListViewController: UIViewController {
         }
     }
     
+    @objc private func handleRefresh()  {
+        Task {
+            await loadMovies()
+            refreshControl.endRefreshing()
+        }
+    }
+    
     private func setupTableView() {
         view.addSubview(tableView)
         tableView.dataSource = self
@@ -25,12 +32,15 @@ class MovieListViewController: UIViewController {
         
         tableView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            tableView.topAnchor.constraint(equalTo: view.topAnchor),
+            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "MovieCell")
+        
+        refreshControl.addTarget(self, action: #selector(handleRefresh), for: .valueChanged)
+        tableView.refreshControl = refreshControl
     }
     
     private func loadMovies() async {
@@ -71,3 +81,4 @@ extension MovieListViewController: UITableViewDelegate {
         
     }
 }
+
