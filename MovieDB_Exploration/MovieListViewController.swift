@@ -5,17 +5,26 @@ class MovieListViewController: UIViewController {
     private var movies: [Movie] = []
     private let tableView = UITableView()
     private let refreshControl = UIRefreshControl()
+    private let searchController = UISearchController(searchResultsController: nil)
    
     private var currentPage = 1
     private var totalPages = 1
     private var isLoadingMoreMovies = false
+    private var searchTask: Task<Void, Never>?
+    private var isSearching = false
+    private var searchResults: [Movie] = []
     
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         title = "Popular Movies"
-        
+    
         setupTableView()
+        
+        navigationItem.searchController = searchController
+        searchController.searchResultsUpdater = self
+        searchController.obscuresBackgroundDuringPresentation = false
+        searchController.searchBar.placeholder = "seach movies"
         
         Task {
             await loadMovies()
@@ -65,7 +74,6 @@ class MovieListViewController: UIViewController {
         
         isLoadingMoreMovies = true
         
-        
         Task {
             do {
                 let nextPage = currentPage + 1
@@ -81,17 +89,28 @@ class MovieListViewController: UIViewController {
             isLoadingMoreMovies = false
         }
     }
+    @MainActor
+    private func performSearch(query:String) async {
+        do {
+            let response = try await NetworkManager.shared.searchMovies(query: query)
+            self.searchResults = response.results
+            self.isSearching = true
+            self.tableView.reloadData()
+        } catch {
+            if !Task.isCancelled {
+                print("Search failed: \(error)")
+            }
+        }
+    }
 }
-
-
 
 extension MovieListViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        movies.count
+        return isSearching ? searchResults.count : movies.count
     }
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "MovieCell", for: indexPath)
-        let movie = movies[indexPath.row]
+        let movie = isSearching ? searchResults[indexPath.row] : movies[indexPath.row]
         
         var content = cell.defaultContentConfiguration()
         content.text = movie.title
@@ -113,6 +132,24 @@ extension MovieListViewController: UITableViewDelegate {
         
         if isNearBottom {
             loadMoreMoviesIfNeeded()
+        }
+    }
+}
+
+extension MovieListViewController: UISearchResultsUpdating {
+    func updateSearchResults(for searchController: UISearchController) {
+        let query = searchController.searchBar.text ?? ""
+        searchTask?.cancel()
+        
+        guard !query.trimmingCharacters(in: .whitespaces).isEmpty else {
+            isSearching = false
+            tableView.reloadData()
+            return
+        }
+        searchTask = Task {
+            try? await Task.sleep(nanoseconds: 400_000_000)
+            guard !Task.isCancelled else { return }
+            await performSearch(query: query)
         }
     }
 }
