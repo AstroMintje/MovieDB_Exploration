@@ -36,8 +36,11 @@ class MovieListViewController: UIViewController {
     
     private func setupTableView() {
         view.addSubview(tableView)
+        tableView.rowHeight = UITableView.automaticDimension
+        tableView.estimatedRowHeight = 100
         tableView.dataSource = self
         tableView.delegate = self
+        
         
         tableView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
@@ -77,8 +80,31 @@ extension MovieListViewController: UITableViewDataSource {
         var content = cell.defaultContentConfiguration()
         content.text = movie.title
         content.secondaryText = movie.releaseDate
+        content.image = UIImage(systemName: "photo")
+        content.imageProperties.reservedLayoutSize = CGSize(width: 60, height: 90)
+        content.imageProperties.maximumSize = CGSize(width: 60, height: 90)
+        content.imageProperties.cornerRadius = 22
         cell.contentConfiguration = content
         
+        cell.tag = indexPath.row
+        
+        if let posterPath = movie.posterPath {
+            let urlString = "https://image.tmdb.org/t/p/w500\(posterPath)"
+            
+            Task {
+                let image = await ImageLoader.shared.loadImage(from: urlString)
+                guard cell.tag == indexPath.row else { return }
+                
+                var updatedContent = cell.defaultContentConfiguration()
+                updatedContent.text = movie.title
+                updatedContent.secondaryText = movie.releaseDate
+                updatedContent.image = image ?? UIImage(systemName: "photo")
+                updatedContent.imageProperties.reservedLayoutSize = CGSize(width: 60, height: 90)
+                updatedContent.imageProperties.maximumSize = CGSize(width: 60, height: 90)
+                updatedContent.imageProperties.cornerRadius = 22
+                cell.contentConfiguration = updatedContent
+            }
+        }
         return cell
     }
 }
