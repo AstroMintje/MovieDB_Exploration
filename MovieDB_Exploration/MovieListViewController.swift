@@ -113,7 +113,9 @@ extension MovieListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         tableView.deselectRow(at: indexPath, animated: true)
         let selectedMovie = viewModel.currentItems[indexPath.row]
-        print("Tapped: \(selectedMovie.title)")
+       
+        let detailVC = MovieDetailViewController(movie: selectedMovie)
+        navigationController?.pushViewController(detailVC, animated: true)
     }
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         viewModel.loadMoreMoviesIfNeeded(currentRow: indexPath.row)
