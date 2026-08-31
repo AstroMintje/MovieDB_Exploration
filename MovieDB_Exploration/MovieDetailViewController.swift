@@ -3,6 +3,16 @@ import UIKit
 final class MovieDetailViewController: UIViewController {
     
     private let movie: Movie
+    private let viewModel = MovieDetailViewModel()
+    
+    private let scrollView = UIScrollView()
+    private let contentView = UIView()
+    private let posterImageView = UIImageView()
+    private let infoStackView = UIStackView()
+    private let titleLabel = UILabel()
+    private let metaLabel = UILabel()
+    private let additionalInfoLabel = UILabel()
+    private let overviewLabel = UILabel()
     
     init(movie: Movie) {
         self.movie = movie
@@ -17,6 +27,116 @@ final class MovieDetailViewController: UIViewController {
         super.viewDidLoad()
         view.backgroundColor = .systemBackground
         title = movie.title
-        print("Showing details for \(movie.title)")
+        
+        viewModel.delegate = self
+        
+        setupLayout()
+        configureContent()
+        loadPosterImage()
+        
+        Task{
+            print("Task started, about to fetch detail")
+            await viewModel.loadMovieDetail(id: movie.id)
+            print("Task finished calling loadMovieDetail")
+        }
+    }
+    
+    private func setupLayout() {
+        view.addSubview(scrollView)
+        scrollView.addSubview(contentView)
+        contentView.addSubview(posterImageView)
+        contentView.addSubview(infoStackView)
+        
+        posterImageView.contentMode = .scaleAspectFit
+        posterImageView.clipsToBounds = true
+        posterImageView.backgroundColor = .black
+        
+        infoStackView.axis = .vertical
+        infoStackView.spacing = 8
+        infoStackView.isLayoutMarginsRelativeArrangement = true
+        infoStackView.layoutMargins = UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 16)
+        
+        titleLabel.font = .boldSystemFont(ofSize: 24)
+        titleLabel.numberOfLines = 0
+        
+        metaLabel.font = .systemFont(ofSize: 16)
+        metaLabel.textColor = .secondaryLabel
+        metaLabel.numberOfLines = 0
+        
+        additionalInfoLabel.font = .systemFont(ofSize: 14)
+        additionalInfoLabel.textColor = .tertiaryLabel
+        additionalInfoLabel.numberOfLines = 0
+        
+        overviewLabel.font = .systemFont(ofSize: 16)
+        overviewLabel.numberOfLines = 0
+        
+        infoStackView.addArrangedSubview(titleLabel)
+        infoStackView.addArrangedSubview(metaLabel)
+        infoStackView.addArrangedSubview(additionalInfoLabel)
+        infoStackView.addArrangedSubview(overviewLabel)
+        
+        [scrollView, contentView, posterImageView, infoStackView].forEach {
+            $0.translatesAutoresizingMaskIntoConstraints = false
+        }
+        
+        let infoStackBottomConstraint = infoStackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
+        infoStackBottomConstraint.priority = .defaultLow
+        
+        NSLayoutConstraint.activate([
+            scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            
+            contentView.topAnchor.constraint(equalTo: scrollView.topAnchor),
+            contentView.bottomAnchor.constraint(equalTo: scrollView.bottomAnchor),
+            contentView.trailingAnchor.constraint(equalTo: scrollView.trailingAnchor),
+            contentView.leadingAnchor.constraint(equalTo: scrollView.leadingAnchor),
+            contentView.widthAnchor.constraint(equalTo: view.widthAnchor),
+            contentView.heightAnchor.constraint(greaterThanOrEqualTo: scrollView.frameLayoutGuide.heightAnchor),
+            
+            posterImageView.topAnchor.constraint(equalTo: contentView.topAnchor),
+            posterImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            posterImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+//            posterImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
+//            posterImageView.widthAnchor.constraint(equalTo: view.widthAnchor),
+            posterImageView.heightAnchor.constraint(equalToConstant: 400),
+            
+            infoStackView.topAnchor.constraint(equalTo: posterImageView.bottomAnchor),
+            infoStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            infoStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            infoStackBottomConstraint
+            
+        ])
+    }
+    private func configureContent() {
+        titleLabel.text = movie.title
+        let rating = String(format: "%.1f", movie.voteAverage)
+        metaLabel.text = "\(movie.releaseDate)\n⭐️ \(rating)/10"
+        overviewLabel.text = movie.overview
+    }
+    
+    private func loadPosterImage() {
+        guard let posterPath = movie.posterPath else { return }
+        let urlString = "https://image.tmdb.org/t/p/w500\(posterPath)"
+        
+        Task{
+            let image = await ImageLoader.shared.loadImage(from: urlString)
+            posterImageView.image = image
+        }
+    }
+}
+
+extension MovieDetailViewController: MovieDetailViewModelDelegate {
+    func movieDetailDidUpdate() {
+        guard let detail = viewModel.movieDetail else { return }
+        
+        let genreNames = detail.genres.map { $0.name }.joined(separator: ", ")
+        let runtimeText = detail.runtime.map { "\($0) min" } ?? "N/A"
+        
+        additionalInfoLabel.text = "\(runtimeText) • \(genreNames)"
+    }
+    func didEncounterError(_ error: Error) {
+        print("Failed to load movie details: \(error)")
     }
 }

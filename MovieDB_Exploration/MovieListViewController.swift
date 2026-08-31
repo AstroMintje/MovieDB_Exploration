@@ -101,7 +101,7 @@ extension MovieListViewController: UITableViewDataSource {
                 updatedContent.image = image ?? UIImage(systemName: "photo")
                 updatedContent.imageProperties.reservedLayoutSize = CGSize(width: 60, height: 90)
                 updatedContent.imageProperties.maximumSize = CGSize(width: 60, height: 90)
-                updatedContent.imageProperties.cornerRadius = 22
+                updatedContent.imageProperties.cornerRadius = 14
                 cell.contentConfiguration = updatedContent
             }
         }

@@ -67,4 +67,33 @@ final class NetworkManager {
             throw NetworkError.decodingFailed
         }
     }
+    
+    func fetchMovieDetails(id: Int) async throws -> MovieDetail {
+        guard var components = URLComponents(string: "\(baseURL)/movie/\(id)") else{
+            throw NetworkError.invalidURL
+        }
+        components.queryItems = [
+            URLQueryItem(name: "language", value: "en-US"),
+            URLQueryItem(name: "append_to_response", value: "credits")
+        ]
+        guard let url = components.url else {
+            throw NetworkError.invalidURL
+        }
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        request.setValue("Bearer \(Secrets.tmdbAccessToken)", forHTTPHeaderField: "Authorization")
+        request.setValue("application/json", forHTTPHeaderField: "accept")
+                         
+        let (data,response) = try await URLSession.shared.data(for: request)
+                         
+        guard let httpResponse = response as? HTTPURLResponse,
+            (200...299).contains(httpResponse.statusCode) else {
+            throw NetworkError.invalidResponse
+        }
+        do {
+            return try JSONDecoder().decode(MovieDetail.self, from: data)
+        }catch {
+            throw NetworkError.decodingFailed
+        }
+    }
 }
