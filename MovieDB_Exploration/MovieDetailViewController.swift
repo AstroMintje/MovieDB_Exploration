@@ -13,6 +13,8 @@ final class MovieDetailViewController: UIViewController {
     private let metaLabel = UILabel()
     private let additionalInfoLabel = UILabel()
     private let overviewLabel = UILabel()
+    private let castScrollView = UIScrollView()
+    private let castStackView = UIStackView()
     
     init(movie: Movie) {
         self.movie = movie
@@ -56,26 +58,33 @@ final class MovieDetailViewController: UIViewController {
         infoStackView.isLayoutMarginsRelativeArrangement = true
         infoStackView.layoutMargins = UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 16)
         
-        titleLabel.font = .boldSystemFont(ofSize: 24)
+        titleLabel.font = .boldSystemFont(ofSize: 25)
         titleLabel.numberOfLines = 0
         
-        metaLabel.font = .systemFont(ofSize: 16)
+        metaLabel.font = .systemFont(ofSize: 14)
         metaLabel.textColor = .secondaryLabel
         metaLabel.numberOfLines = 0
         
-        additionalInfoLabel.font = .systemFont(ofSize: 14)
+        additionalInfoLabel.font = .systemFont(ofSize: 12)
         additionalInfoLabel.textColor = .tertiaryLabel
         additionalInfoLabel.numberOfLines = 0
         
-        overviewLabel.font = .systemFont(ofSize: 16)
+        overviewLabel.font = .systemFont(ofSize: 14)
         overviewLabel.numberOfLines = 0
+        
+        castStackView.axis = .horizontal
+        castStackView.spacing = 6
+        
+        castScrollView.showsHorizontalScrollIndicator = false
+        castScrollView.addSubview(castStackView)
         
         infoStackView.addArrangedSubview(titleLabel)
         infoStackView.addArrangedSubview(metaLabel)
         infoStackView.addArrangedSubview(additionalInfoLabel)
         infoStackView.addArrangedSubview(overviewLabel)
+        infoStackView.addArrangedSubview(castScrollView)
         
-        [scrollView, contentView, posterImageView, infoStackView].forEach {
+        [scrollView, contentView, posterImageView, infoStackView, castStackView, castScrollView].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
         }
         
@@ -105,6 +114,14 @@ final class MovieDetailViewController: UIViewController {
             infoStackView.topAnchor.constraint(equalTo: posterImageView.bottomAnchor),
             infoStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
             infoStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
+            
+            castStackView.leadingAnchor.constraint(equalTo: castScrollView.leadingAnchor),
+            castStackView.trailingAnchor.constraint(equalTo: castScrollView.trailingAnchor),
+            castStackView.topAnchor.constraint(equalTo: castScrollView.topAnchor),
+            castStackView.bottomAnchor.constraint(equalTo: castScrollView.bottomAnchor),
+            castStackView.heightAnchor.constraint(equalTo: castScrollView.heightAnchor),
+            castScrollView.heightAnchor.constraint(equalToConstant: 36),
+            
             infoStackBottomConstraint
             
         ])
@@ -125,6 +142,27 @@ final class MovieDetailViewController: UIViewController {
             posterImageView.image = image
         }
     }
+    private func makeCastChip(name: String) -> UIView {
+        let label = UILabel()
+        label.text = name
+        label.font = .systemFont(ofSize:13)
+        label.textColor = .label
+        label.translatesAutoresizingMaskIntoConstraints = false
+        
+        let container = UIView()
+        container.backgroundColor = .secondarySystemBackground
+        container.layer.cornerRadius = 16
+        container.addSubview(label)
+        
+        NSLayoutConstraint.activate([
+            label.leadingAnchor.constraint(equalTo: container.leadingAnchor, constant: 12),
+            label.trailingAnchor.constraint(equalTo: container.trailingAnchor, constant: -12),
+            label.topAnchor.constraint(equalTo: container.topAnchor, constant: 6),
+            label.bottomAnchor.constraint(equalTo: container.bottomAnchor, constant: -6)
+        ])
+        
+    return container
+    }
 }
 
 extension MovieDetailViewController: MovieDetailViewModelDelegate {
@@ -133,8 +171,15 @@ extension MovieDetailViewController: MovieDetailViewModelDelegate {
         
         let genreNames = detail.genres.map { $0.name }.joined(separator: ", ")
         let runtimeText = detail.runtime.map { "\($0) min" } ?? "N/A"
-        
         additionalInfoLabel.text = "\(runtimeText) • \(genreNames)"
+        
+        if let cast = detail.credits?.cast{
+            castStackView.arrangedSubviews.forEach { $0.removeFromSuperview() }
+            for member in cast.prefix(10) {
+                let chip = makeCastChip(name: member.name)
+                castStackView.addArrangedSubview(chip)
+            }
+        }
     }
     func didEncounterError(_ error: Error) {
         print("Failed to load movie details: \(error)")

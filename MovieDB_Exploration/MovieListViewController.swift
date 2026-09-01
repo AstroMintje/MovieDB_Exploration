@@ -40,7 +40,6 @@ class MovieListViewController: UIViewController {
         tableView.dataSource = self
         tableView.delegate = self
         
-        
         tableView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
             tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
