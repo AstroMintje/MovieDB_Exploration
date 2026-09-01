@@ -2,7 +2,6 @@ import UIKit
 
 class MovieListViewController: UIViewController {
     
-    private var movies: [Movie] = []
     private let tableView = UITableView()
     private let refreshControl = UIRefreshControl()
     private let searchController = UISearchController(searchResultsController: nil)
@@ -49,7 +48,7 @@ class MovieListViewController: UIViewController {
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
-        tableView.register(UITableViewCell.self, forCellReuseIdentifier: "MovieCell")
+        tableView.register(MovieTableViewCell.self, forCellReuseIdentifier: MovieTableViewCell.reuseIdentifier)
         
         refreshControl.addTarget(self, action: #selector(handleRefresh), for: .valueChanged)
         tableView.refreshControl = refreshControl
@@ -73,38 +72,13 @@ extension MovieListViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         viewModel.currentItems.count
     }
+    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "MovieCell", for: indexPath)
-        let movie =  viewModel.currentItems[indexPath.row]
-        
-        var content = cell.defaultContentConfiguration()
-        content.text = movie.title
-        content.secondaryText = movie.releaseDate
-        content.image = UIImage(systemName: "photo")
-        content.imageProperties.reservedLayoutSize = CGSize(width: 60, height: 90)
-        content.imageProperties.maximumSize = CGSize(width: 60, height: 90)
-        content.imageProperties.cornerRadius = 22
-        cell.contentConfiguration = content
-        
-        cell.tag = indexPath.row
-        
-        if let posterPath = movie.posterPath {
-            let urlString = "https://image.tmdb.org/t/p/w500\(posterPath)"
-            
-            Task {
-                let image = await ImageLoader.shared.loadImage(from: urlString)
-                guard cell.tag == indexPath.row else { return }
-                
-                var updatedContent = cell.defaultContentConfiguration()
-                updatedContent.text = movie.title
-                updatedContent.secondaryText = movie.releaseDate
-                updatedContent.image = image ?? UIImage(systemName: "photo")
-                updatedContent.imageProperties.reservedLayoutSize = CGSize(width: 60, height: 90)
-                updatedContent.imageProperties.maximumSize = CGSize(width: 60, height: 90)
-                updatedContent.imageProperties.cornerRadius = 14
-                cell.contentConfiguration = updatedContent
-            }
+     guard let cell = tableView.dequeueReusableCell(withIdentifier: MovieTableViewCell.reuseIdentifier, for: indexPath) as? MovieTableViewCell else {
+            return UITableViewCell()
         }
+        let movie = viewModel.currentItems[indexPath.row]
+        cell.configure(with: movie)
         return cell
     }
 }

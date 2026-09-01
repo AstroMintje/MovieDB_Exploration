@@ -17,5 +17,4 @@ final class MovieDetailViewModel {
             delegate?.didEncounterError(error)
         }
     }
-    
 }

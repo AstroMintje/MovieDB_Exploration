@@ -5,6 +5,15 @@ protocol MovieListViewModelDelegate: AnyObject {
     func searchResultsDidUpdate()
     func didEncounterError(_ error: Error)
 }
+
+//class Something {
+//    let movieListVM = MovieListViewModel()
+//    
+//    func asdasdkmal() {
+//        print(movieListVM.movies)
+//        movieListVM.movies.removeAll()
+//    }
+//}
  
 final class MovieListViewModel {
     
