@@ -14,7 +14,7 @@ protocol MovieListViewModelDelegate: AnyObject {
 //        movieListVM.movies.removeAll()
 //    }
 //}
- 
+
 final class MovieListViewModel {
     
     weak var delegate: MovieListViewModelDelegate?
@@ -95,4 +95,3 @@ final class MovieListViewModel {
     }
     
 }
-

@@ -30,3 +30,8 @@ struct MovieResponse: Codable {
         case totalPages = "total_pages"
     }
 }
+
+struct MovieSection {
+    let title: String
+    let movies: [Movie]
+}

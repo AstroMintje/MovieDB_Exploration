@@ -4,8 +4,8 @@ class MovieListViewController: UIViewController {
     
     private let tableView = UITableView()
     private let refreshControl = UIRefreshControl()
-    private let searchController = UISearchController(searchResultsController: nil)
     private let viewModel = MovieListViewModel()
+    let labeldsadml = UILabel()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -13,13 +13,9 @@ class MovieListViewController: UIViewController {
         title = "Popular Movies"
     
         viewModel.delegate = self
+//        viewModel.delegate = self // ini yang bikin connect
         
         setupTableView()
-        
-        navigationItem.searchController = searchController
-        searchController.searchResultsUpdater = self
-        searchController.obscuresBackgroundDuringPresentation = false
-        searchController.searchBar.placeholder = "search movies"
         
         Task {
             await viewModel.loadInitialMovies()
@@ -39,6 +35,7 @@ class MovieListViewController: UIViewController {
         tableView.estimatedRowHeight = 100
         tableView.dataSource = self
         tableView.delegate = self
+        tableView.backgroundColor = .systemBackground
         
         tableView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
@@ -55,7 +52,6 @@ class MovieListViewController: UIViewController {
 }
 
 extension MovieListViewController: MovieListViewModelDelegate {
-    
     func moviesDidUpdate() {
         tableView.reloadData()
     }
@@ -92,12 +88,5 @@ extension MovieListViewController: UITableViewDelegate {
     }
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         viewModel.loadMoreMoviesIfNeeded(currentRow: indexPath.row)
-        }
-    }
-
-extension MovieListViewController: UISearchResultsUpdating {
-    func updateSearchResults(for searchController: UISearchController) {
-        let query = searchController.searchBar.text ?? ""
-        viewModel.search(query: query)
     }
 }
