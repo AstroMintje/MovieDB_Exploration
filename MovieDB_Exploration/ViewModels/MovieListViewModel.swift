@@ -1,6 +1,6 @@
 import UIKit
 
-protocol MovieListViewModelDelegate: AnyObject {
+protocol MovieListViewModelDelegate {
     func moviesDidUpdate()
     func searchResultsDidUpdate()
     func didEncounterError(_ error: Error)
@@ -17,7 +17,7 @@ protocol MovieListViewModelDelegate: AnyObject {
 
 final class MovieListViewModel {
     
-    weak var delegate: MovieListViewModelDelegate?
+     var delegate: MovieListViewModelDelegate?
     
     private(set) var movies: [Movie] = []
     private(set) var searchResults: [Movie] = []
@@ -43,7 +43,6 @@ final class MovieListViewModel {
             delegate?.didEncounterError(error)
         }
     }
-    
     func loadMoreMoviesIfNeeded(currentRow: Int) {
         guard currentRow >= movies.count - 5 else { return }
         guard !isLoadingMoreMovies else { return }

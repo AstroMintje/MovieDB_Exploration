@@ -51,7 +51,6 @@ final class FavoritesListViewController: UIViewController {
             emptyStateLabel.centerXAnchor.constraint(equalTo: view.centerXAnchor),
             emptyStateLabel.centerYAnchor.constraint(equalTo: view.centerYAnchor),
         ])
-        
     }
 }
 extension FavoritesListViewController: UITableViewDataSource {

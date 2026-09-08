@@ -35,9 +35,7 @@ final class MovieDetailViewController: UIViewController {
         loadPosterImage()
         
         Task{
-            print("Task started, about to fetch detail")
             await viewModel.loadMovieDetail(id: movie.id)
-            print("Task finished calling loadMovieDetail")
         }
     }
     
@@ -46,28 +44,35 @@ final class MovieDetailViewController: UIViewController {
         scrollView.addSubview(contentView)
         contentView.addSubview(posterImageView)
         contentView.addSubview(infoStackView)
+//        scrollView.contentInsetAdjustmentBehavior = .never
+    
+        infoStackView.axis = .vertical
+        infoStackView.spacing = 12
+        infoStackView.isLayoutMarginsRelativeArrangement = true
+        infoStackView.layoutMargins = UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 16)
+        
+        infoStackView.addArrangedSubview(titleLabel)
+        infoStackView.addArrangedSubview(metaLabel)
+        infoStackView.addArrangedSubview(additionalInfoLabel)
+        infoStackView.addArrangedSubview(overviewLabel)
+        infoStackView.addArrangedSubview(castScrollView)
         
         posterImageView.contentMode = .scaleAspectFit
         posterImageView.clipsToBounds = true
         posterImageView.backgroundColor = .black
         
-        infoStackView.axis = .vertical
-        infoStackView.spacing = 8
-        infoStackView.isLayoutMarginsRelativeArrangement = true
-        infoStackView.layoutMargins = UIEdgeInsets(top: 16, left: 16, bottom: 16, right: 16)
-        
-        titleLabel.font = .boldSystemFont(ofSize: 25)
+        titleLabel.font = .boldSystemFont(ofSize: 30)
         titleLabel.numberOfLines = 0
         
-        metaLabel.font = .systemFont(ofSize: 14)
+        metaLabel.font = .systemFont(ofSize: 16)
         metaLabel.textColor = .secondaryLabel
         metaLabel.numberOfLines = 0
         
-        additionalInfoLabel.font = .systemFont(ofSize: 12)
-        additionalInfoLabel.textColor = .tertiaryLabel
+        additionalInfoLabel.font = .systemFont(ofSize: 14)
+        additionalInfoLabel.textColor = .secondaryLabel
         additionalInfoLabel.numberOfLines = 0
         
-        overviewLabel.font = .systemFont(ofSize: 14)
+        overviewLabel.font = .systemFont(ofSize: 16)
         overviewLabel.numberOfLines = 0
         
         castStackView.axis = .horizontal
@@ -76,11 +81,6 @@ final class MovieDetailViewController: UIViewController {
         castScrollView.showsHorizontalScrollIndicator = false
         castScrollView.addSubview(castStackView)
         
-        infoStackView.addArrangedSubview(titleLabel)
-        infoStackView.addArrangedSubview(metaLabel)
-        infoStackView.addArrangedSubview(additionalInfoLabel)
-        infoStackView.addArrangedSubview(overviewLabel)
-        infoStackView.addArrangedSubview(castScrollView)
         
         [scrollView, contentView, posterImageView, infoStackView, castStackView, castScrollView].forEach {
             $0.translatesAutoresizingMaskIntoConstraints = false
@@ -90,7 +90,7 @@ final class MovieDetailViewController: UIViewController {
         infoStackBottomConstraint.priority = .defaultLow
         
         NSLayoutConstraint.activate([
-            scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            scrollView.topAnchor.constraint(equalTo: view.topAnchor),
             scrollView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
@@ -107,7 +107,8 @@ final class MovieDetailViewController: UIViewController {
             posterImageView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
 //            posterImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor),
 //            posterImageView.widthAnchor.constraint(equalTo: view.widthAnchor),
-            posterImageView.heightAnchor.constraint(equalToConstant: 400),
+//            posterImageView.heightAnchor.constraint(equalToConstant: 550),
+            posterImageView.heightAnchor.constraint(equalTo: posterImageView.widthAnchor, multiplier: 1.5),
             
             infoStackView.topAnchor.constraint(equalTo: posterImageView.bottomAnchor),
             infoStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),

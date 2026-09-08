@@ -30,13 +30,13 @@ final class MovieTableViewCell: UITableViewCell {
     private func setupViews() {
         posterImageView.contentMode = .scaleAspectFill
         posterImageView.clipsToBounds = true
-        posterImageView.layer.cornerRadius = 8
+        posterImageView.layer.cornerRadius = 22
         posterImageView.backgroundColor = .secondarySystemBackground
         
-        titleLabel.font = .boldSystemFont(ofSize: 14)
-        titleLabel.numberOfLines = 2
+        titleLabel.font = .boldSystemFont(ofSize: 20)
+        titleLabel.numberOfLines = 4
         
-        dateLabel.font = .systemFont(ofSize: 12)
+        dateLabel.font = .systemFont(ofSize: 16)
         dateLabel.textColor = .secondaryLabel
         
         [posterImageView, titleLabel, dateLabel].forEach {
@@ -45,15 +45,17 @@ final class MovieTableViewCell: UITableViewCell {
         }
         
         NSLayoutConstraint.activate([
-            posterImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 12),
-            posterImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 8),
-            posterImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -8),
-            posterImageView.widthAnchor.constraint(equalToConstant: 60),
-            posterImageView.heightAnchor.constraint(equalToConstant: 90),
+            posterImageView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
+            posterImageView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 12),
+            posterImageView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -12),
+//            posterImageView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+//            posterImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
+            posterImageView.widthAnchor.constraint(equalToConstant: 100),
+            posterImageView.heightAnchor.constraint(equalToConstant: 150),
             
             titleLabel.leadingAnchor.constraint(equalTo: posterImageView.trailingAnchor, constant: 12),
             titleLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -12),
-            titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor),
+            titleLabel.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 6),
             
             dateLabel.leadingAnchor.constraint(equalTo: titleLabel.leadingAnchor),
             dateLabel.trailingAnchor.constraint(equalTo: titleLabel.trailingAnchor),

@@ -5,18 +5,18 @@ class MovieListViewController: UIViewController {
     private let tableView = UITableView()
     private let refreshControl = UIRefreshControl()
     private let viewModel = MovieListViewModel()
-    let labeldsadml = UILabel()
+    private let acakak = UIView()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = .systemBackground
+        view.backgroundColor = .red
         title = "Popular Movies"
     
         viewModel.delegate = self
 //        viewModel.delegate = self // ini yang bikin connect
         
         setupTableView()
-        
+
         Task {
             await viewModel.loadInitialMovies()
         }
@@ -32,14 +32,14 @@ class MovieListViewController: UIViewController {
     private func setupTableView() {
         view.addSubview(tableView)
         tableView.rowHeight = UITableView.automaticDimension
-        tableView.estimatedRowHeight = 100
+        tableView.estimatedRowHeight = 10
         tableView.dataSource = self
         tableView.delegate = self
         tableView.backgroundColor = .systemBackground
         
         tableView.translatesAutoresizingMaskIntoConstraints = false
         NSLayoutConstraint.activate([
-            tableView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            tableView.topAnchor.constraint(equalTo: view.topAnchor),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
@@ -67,7 +67,6 @@ extension MovieListViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         viewModel.currentItems.count
     }
-    
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
      guard let cell = tableView.dequeueReusableCell(withIdentifier: MovieTableViewCell.reuseIdentifier, for: indexPath) as? MovieTableViewCell else {
             return UITableViewCell()
