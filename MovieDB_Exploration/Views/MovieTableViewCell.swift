@@ -4,6 +4,7 @@ final class MovieTableViewCell: UITableViewCell {
     
     static let reuseIdentifier: String = "MovieTableViewCell"
     
+    private let posterContainerView = UIView()
     private let posterImageView = UIImageView()
     private let titleLabel = UILabel()
     private let dateLabel = UILabel()
@@ -18,6 +19,11 @@ final class MovieTableViewCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        posterContainerView.layer.shadowPath = UIBezierPath(roundedRect: posterContainerView.bounds, cornerRadius: 22).cgPath
+    }
+    
     override func prepareForReuse() {
         super.prepareForReuse()
         imageLoadTask?.cancel()
@@ -30,13 +36,17 @@ final class MovieTableViewCell: UITableViewCell {
     private func setupViews() {
         posterImageView.contentMode = .scaleAspectFill
         posterImageView.clipsToBounds = true
-        posterImageView.layer.cornerRadius = 22
         posterImageView.backgroundColor = .secondarySystemBackground
+        posterImageView.layer.cornerRadius = 22
+        posterImageView.layer.shadowColor = UIColor.black.cgColor
+        posterImageView.layer.shadowRadius = 4
+        posterImageView.layer.shadowOpacity = 0.15
+        posterImageView.layer.shadowOffset = CGSize(width: 0, height: 2)
         
-        titleLabel.font = .boldSystemFont(ofSize: 20)
+        titleLabel.font = .preferredFont(forTextStyle: .headline)
         titleLabel.numberOfLines = 4
         
-        dateLabel.font = .systemFont(ofSize: 16)
+        dateLabel.font = .preferredFont(forTextStyle: .subheadline)
         dateLabel.textColor = .secondaryLabel
         
         [posterImageView, titleLabel, dateLabel].forEach {

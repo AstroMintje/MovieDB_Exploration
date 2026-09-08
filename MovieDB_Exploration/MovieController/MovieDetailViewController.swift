@@ -59,20 +59,20 @@ final class MovieDetailViewController: UIViewController {
         
         posterImageView.contentMode = .scaleAspectFit
         posterImageView.clipsToBounds = true
-        posterImageView.backgroundColor = .black
+        posterImageView.backgroundColor = .secondarySystemBackground
         
-        titleLabel.font = .boldSystemFont(ofSize: 30)
+        titleLabel.font = .preferredFont(forTextStyle: .title1)
         titleLabel.numberOfLines = 0
         
-        metaLabel.font = .systemFont(ofSize: 16)
+        metaLabel.font = .preferredFont(forTextStyle: .subheadline)
         metaLabel.textColor = .secondaryLabel
         metaLabel.numberOfLines = 0
         
-        additionalInfoLabel.font = .systemFont(ofSize: 14)
+        additionalInfoLabel.font = .preferredFont(forTextStyle: .caption1)
         additionalInfoLabel.textColor = .secondaryLabel
         additionalInfoLabel.numberOfLines = 0
         
-        overviewLabel.font = .systemFont(ofSize: 16)
+        overviewLabel.font = .preferredFont(forTextStyle: .body)
         overviewLabel.numberOfLines = 0
         
         castStackView.axis = .horizontal
