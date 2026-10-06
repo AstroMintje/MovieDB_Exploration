@@ -21,9 +21,11 @@ final class MovieTableViewCell: UITableViewCell {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        posterContainerView.layer.shadowPath = UIBezierPath(roundedRect: posterContainerView.bounds, cornerRadius: 22).cgPath
+        posterContainerView.layer.shadowPath = UIBezierPath(
+            roundedRect: posterContainerView.bounds,
+            cornerRadius: 22).cgPath
     }
-    
+        
     override func prepareForReuse() {
         super.prepareForReuse()
         imageLoadTask?.cancel()
@@ -31,6 +33,7 @@ final class MovieTableViewCell: UITableViewCell {
         posterImageView.image = UIImage(systemName: "photo")
         titleLabel.text = nil
         dateLabel.text = nil
+        accessibilityLabel = nil
     }
     
     private func setupViews() {
@@ -75,6 +78,10 @@ final class MovieTableViewCell: UITableViewCell {
     func configure(with movie: Movie){
         titleLabel.text = movie.title
        dateLabel.text = movie.releaseDate
+        
+        isAccessibilityElement = true
+        accessibilityLabel = "Movie title:\(movie.title), release Date: \(movie.releaseDate)"
+        accessibilityTraits = .button
         
         guard let posterPath = movie.posterPath else { return }
         let urlString = "https://image.tmdb.org/t/p/w500\(posterPath)"

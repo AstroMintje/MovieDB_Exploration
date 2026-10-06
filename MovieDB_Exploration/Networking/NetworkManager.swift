@@ -32,6 +32,13 @@ final class NetworkManager {
         }
     }
     
+    struct Model {
+        let name: String
+        let age: Int
+    }
+    
+    
+    
     func fetchPopularMovies(page: Int = 1) async throws -> MovieResponse {
         guard let url = URL(string: "\(baseURL)/movie/popular?language=en-US&page=\(page)")
         else {

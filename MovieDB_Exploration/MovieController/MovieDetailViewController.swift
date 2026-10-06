@@ -42,6 +42,7 @@ final class MovieDetailViewController: UIViewController {
     private func setupLayout() {
         view.addSubview(scrollView)
         scrollView.addSubview(contentView)
+        castScrollView.addSubview(castStackView)
         contentView.addSubview(posterImageView)
         contentView.addSubview(infoStackView)
 //        scrollView.contentInsetAdjustmentBehavior = .never
@@ -79,7 +80,7 @@ final class MovieDetailViewController: UIViewController {
         castStackView.spacing = 6
         
         castScrollView.showsHorizontalScrollIndicator = false
-        castScrollView.addSubview(castStackView)
+       
         
         
         [scrollView, contentView, posterImageView, infoStackView, castStackView, castScrollView].forEach {

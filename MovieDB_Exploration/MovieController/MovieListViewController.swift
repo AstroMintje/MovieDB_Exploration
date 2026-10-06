@@ -5,7 +5,6 @@ class MovieListViewController: UIViewController {
     private let tableView = UITableView()
     private let refreshControl = UIRefreshControl()
     private let viewModel = MovieListViewModel()
-    private let acakak = UIView()
     
     override func viewDidLoad() {
         super.viewDidLoad()
